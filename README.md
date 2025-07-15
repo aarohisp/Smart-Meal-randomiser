@@ -15,4 +15,4 @@ This is a simple frontend-only web app to suggest random Indian meal pairs (Curr
 
 ---
 
-🔗 [View Live Demo](https://aarohisp.github.io/Smart-Meal-randomiser/) ()
+🔗 [View Live Demo](https://aarohisp.github.io/Smart-Meal-randomiser/)
