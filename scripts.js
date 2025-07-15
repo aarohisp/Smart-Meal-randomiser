@@ -1,12 +1,31 @@
-// Load recipes from recipes.json
-let recipes = [];
+const recipes = [
+    {
+        "name": "Dhabewali dal",
+        "type": "curry",
+        "tag": "masala",
+        "ingredients": ["onion", "tomato", "garlic"]
+    },
+    {
+        "name": "Aloo Gobi",
+        "type": "sabzi",
+        "tag": "simple",
+        "ingredients": ["potato", "cauliflower", "onion"]
+    },
+    {
+        "name": "Baingan Bharta",
+        "type": "sabzi",
+        "tag": "masala",
+        "ingredients": ["brinjal", "onion", "tomato"]
+    },
+    {
+        "name": "Palak Paneer",
+        "type": "curry",
+        "tag": "simple",
+        "ingredients": ["spinach", "paneer", "garlic"]
+    }
+]
 
-fetch('recipes.json')
-    .then(response => response.json())
-    .then(data => {
-        recipes = data;
-        generateVeggieList();
-    });
+generateVeggieList();
 
 function generateVeggieList() {
     const veggies = new Set();
