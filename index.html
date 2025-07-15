@@ -3,13 +3,128 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Meal Randomiser (Firebase)</title>
-  <script type="module">
-    // Import Firebase SDKs
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <title>Meal Randomiser</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      background: #ff7043;
+      color: white;
+      padding: 20px;
+      width: 100%;
+      text-align: center;
+      font-size: 1.8em;
+    }
+    .container {
+      margin-top: 20px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 600px;
+    }
+    h3 {
+      margin-bottom: 8px;
+    }
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .checkbox-group label {
+      background: #e0e0e0;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button {
+      background: #ff7043;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      border-radius: 5px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #f4511e;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 10px 0;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .result {
+      margin-top: 20px;
+      background: #f1f8e9;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    .form-section {
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 5px;
+      background: #f9f9f9;
+    }
+    footer {
+      margin-top: 30px;
+      font-size: 0.9em;
+      color: #777;
+    }
+    footer a {
+      color: #ff7043;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <header>🥘 Meal Randomiser (Firebase)</header>
+  <div class="container">
+    <!-- Add Dish Form -->
+    <h3>Add New Dish</h3>
+    <input type="text" id="dish-name" placeholder="Dish Name"><br>
+    Type:
+    <input type="radio" name="dish-type" value="curry" checked> Curry
+    <input type="radio" name="dish-type" value="sabzi"> Sabzi<br>
+    Tag:
+    <input type="radio" name="dish-tag" value="masala" checked> Masala
+    <input type="radio" name="dish-tag" value="simple"> Simple<br>
+    Ingredients:
+    <input type="text" id="dish-ingredients" placeholder="onion, tomato, garlic"><br>
+    <button onclick="addDish()">➕ Add Dish</button>
 
-    // Your Firebase config (replace this with your actual config)
+    <h3>Suggested Staples:</h3>
+    <div id="suggested-list"></div>
+    <button onclick="selectAllSuggested()">✅ Select All Staples</button>
+
+    <h3>Other Available Vegetables:</h3>
+    <div id="veggie-list"></div>
+
+    <h3>Avoid Ingredients:</h3>
+    <div id="avoid-list"></div>
+
+    <button onclick="suggestMeal()">🎲 Suggest Meal</button>
+
+    <div id="result" style="display:none;"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
     const firebaseConfig = {
     apiKey: "AIzaSyD-M1tODKa5y5395slTEW2wP2-1BImbn_E",
     authDomain: "menu-randomiser.firebaseapp.com",
@@ -18,26 +133,26 @@
     messagingSenderId: "117548737009",
     appId: "1:117548737009:web:2450a287d050b7574ee450"
   };
-
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
     let recipes = [];
 
-    // Fetch recipes from Firestore
     async function fetchRecipes() {
-      const querySnapshot = await getDocs(collection(db, "recipes"));
-      recipes = [];
-      querySnapshot.forEach((doc) => {
-        recipes.push(doc.data());
-      });
-      console.log("Fetched Recipes:", recipes);
-      generateCheckboxes();
+      try {
+        const snapshot = await db.collection("recipes").get();
+        recipes = [];
+        snapshot.forEach((doc) => {
+          recipes.push(doc.data());
+        });
+        console.log("Fetched Recipes:", recipes);
+        generateCheckboxes();
+      } catch (error) {
+        console.error("Error fetching recipes:", error);
+      }
     }
 
-    // Add new recipe to Firestore
     async function addDish() {
       const name = document.getElementById('dish-name').value.trim();
       const type = document.querySelector('input[name="dish-type"]:checked').value;
@@ -46,16 +161,16 @@
         .split(",").map(i => i.trim().toLowerCase()).filter(Boolean);
 
       if (!name || ingredients.length === 0) {
-        alert("Please fill in all fields.");
+        alert("⚠ Please fill in all fields.");
         return;
       }
 
       try {
-        await addDoc(collection(db, "recipes"), {
+        await db.collection("recipes").add({
           name, type, tag, ingredients
         });
-        alert(`✅ ${name} added to Firestore!`);
-        fetchRecipes(); // Refresh list
+        alert(`✅ ${name} added!`);
+        fetchRecipes();
         document.getElementById('dish-name').value = "";
         document.getElementById('dish-ingredients').value = "";
       } catch (e) {
@@ -135,33 +250,8 @@
 
     window.onload = fetchRecipes;
   </script>
-  </head>
-<body>
-  <header>🥘 Meal Randomiser (Firebase)</header>
-  <div class="container">
-    <!-- Add Dish Form -->
-    <h3>Add New Dish</h3>
-    <input type="text" id="dish-name" placeholder="Dish Name"><br>
-    Type: <input type="radio" name="dish-type" value="curry" checked> Curry
-    <input type="radio" name="dish-type" value="sabzi"> Sabzi<br>
-    Tag: <input type="radio" name="dish-tag" value="masala" checked> Masala
-    <input type="radio" name="dish-tag" value="simple"> Simple<br>
-    Ingredients: <input type="text" id="dish-ingredients" placeholder="onion, tomato, garlic"><br>
-    <button onclick="addDish()">Add Dish</button><br><br>
-
-    <h3>Suggested Staples:</h3>
-    <div id="suggested-list"></div>
-    <button onclick="selectAllSuggested()">Select All</button>
-
-    <h3>Other Available Vegetables:</h3>
-    <div id="veggie-list"></div>
-
-    <h3>Avoid Ingredients:</h3>
-    <div id="avoid-list"></div>
-
-    <button onclick="suggestMeal()">Suggest Meal</button>
-
-    <div id="result" style="margin-top: 20px;"></div>
-  </div>
+  <footer>
+    Built by Aarushi | <a href="#">View on GitHub</a>
+  </footer>
 </body>
 </html>
