@@ -1,4 +1,4 @@
-# Smart-Meal-randomiser#
+# Smart-Meal-randomiser
 
 This is a simple frontend-only web app to suggest random Indian meal pairs (Curry + Sabzi) based on tags and available vegetables.
 
