@@ -1,0 +1,74 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f8f8f8;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    background: #ff7043;
+    color: white;
+    padding: 20px;
+    width: 100%;
+    text-align: center;
+    font-size: 1.8em;
+}
+
+.container {
+    margin-top: 20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 500px;
+}
+
+.veggie-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.veggie-list label {
+    background: #e0e0e0;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button {
+    background: #ff7043;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    border-radius: 5px;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #f4511e;
+}
+
+.result {
+    margin-top: 20px;
+    background: #f1f8e9;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+footer {
+    margin-top: 30px;
+    font-size: 0.9em;
+    color: #777;
+}
+
+footer a {
+    color: #ff7043;
+    text-decoration: none;
+}
