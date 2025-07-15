@@ -1,174 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Meal Randomiser</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f8f8f8;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        header {
-            background: #ff7043;
-            color: white;
-            padding: 20px;
-            width: 100%;
-            text-align: center;
-            font-size: 1.8em;
-        }
-        .container {
-            margin-top: 20px;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 500px;
-        }
-        .veggie-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .veggie-list label {
-            background: #e0e0e0;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button {
-            background: #ff7043;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 1em;
-            border-radius: 5px;
-            margin-top: 15px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #f4511e;
-        }
-        .result {
-            margin-top: 20px;
-            background: #f1f8e9;
-            padding: 15px;
-            border-radius: 5px;
-        }
-        footer {
-            margin-top: 30px;
-            font-size: 0.9em;
-            color: #777;
-        }
-        footer a {
-            color: #ff7043;
-            text-decoration: none;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meal Randomiser</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      background: #ff7043;
+      color: white;
+      padding: 20px;
+      width: 100%;
+      text-align: center;
+      font-size: 1.8em;
+    }
+    .container {
+      margin-top: 20px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 600px;
+    }
+    h3 {
+      margin-bottom: 8px;
+    }
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .checkbox-group label {
+      background: #e0e0e0;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button {
+      background: #ff7043;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      border-radius: 5px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #f4511e;
+    }
+    .result {
+      margin-top: 20px;
+      background: #f1f8e9;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    footer {
+      margin-top: 30px;
+      font-size: 0.9em;
+      color: #777;
+    }
+    footer a {
+      color: #ff7043;
+      text-decoration: none;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        🥘 Meal Randomiser
-    </header>
-    <div class="container">
-        <h3>Select Available Vegetables:</h3>
-        <div class="veggie-list" id="veggie-list"></div>
-        <button onclick="suggestMeal()">Suggest Meal</button>
-        <div id="result" class="result" style="display: none;"></div>
-    </div>
-    <footer>
-        Built by Aarohi | <a href="https://github.com/aarohisp/Smart-Meal-randomiser">View on GitHub</a>
-    </footer>
-    <script>
-        // Recipe data
-        const recipes = [
-            {
-                "name": "Dhabewali Dal",
-                "type": "curry",
-                "tag": "masala",
-                "ingredients": ["onion", "tomato", "garlic"]
-            },
-            {
-                "name": "Aloo Gobi",
-                "type": "sabzi",
-                "tag": "simple",
-                "ingredients": ["potato", "cauliflower", "onion"]
-            },
-            {
-                "name": "Baingan Bharta",
-                "type": "sabzi",
-                "tag": "masala",
-                "ingredients": ["brinjal", "onion", "tomato"]
-            },
-            {
-                "name": "Palak Paneer",
-                "type": "curry",
-                "tag": "simple",
-                "ingredients": ["spinach", "paneer", "garlic"]
-            }
-        ];
+  <header>🥘 Meal Randomiser</header>
+  <div class="container">
+    <h3>Suggested Staples:</h3>
+    <div class="checkbox-group" id="suggested-list"></div>
+    <button onclick="selectAllSuggested()">Select All Suggested</button>
 
-        // Dynamically generate veggie checkboxes
-        function generateVeggieList() {
-            const veggies = new Set();
-            recipes.forEach(recipe => {
-                recipe.ingredients.forEach(veg => veggies.add(veg));
-            });
+    <h3>Other Available Vegetables:</h3>
+    <div class="checkbox-group" id="veggie-list"></div>
 
-            const veggieListDiv = document.getElementById("veggie-list");
-            veggies.forEach(veg => {
-                const label = document.createElement("label");
-                label.innerHTML = `<input type="checkbox" value="${veg}"> ${veg.charAt(0).toUpperCase() + veg.slice(1)}`;
-                veggieListDiv.appendChild(label);
-            });
+    <h3>Ingredients to Avoid:</h3>
+    <div class="checkbox-group" id="avoid-list"></div>
+
+    <button onclick="suggestMeal()">Suggest Meal</button>
+
+    <div id="result" class="result" style="display: none;"></div>
+  </div>
+
+  <footer>
+    Built by Aarushi | <a href="#">View on GitHub</a>
+  </footer>
+
+  <script>
+    const recipes = [
+      {
+        "name": "Dhabewali Dal",
+        "type": "curry",
+        "tag": "masala",
+        "ingredients": ["onion", "tomato", "garlic"]
+      },
+      {
+        "name": "Aloo Gobi",
+        "type": "sabzi",
+        "tag": "simple",
+        "ingredients": ["potato", "cauliflower", "onion"]
+      },
+      {
+        "name": "Baingan Bharta",
+        "type": "sabzi",
+        "tag": "masala",
+        "ingredients": ["brinjal", "onion", "tomato"]
+      },
+      {
+        "name": "Palak Paneer",
+        "type": "curry",
+        "tag": "simple",
+        "ingredients": ["spinach", "paneer", "garlic"]
+      }
+    ];
+
+    const staples = ["onion", "tomato", "garlic", "potato", "ginger", "green chili"];
+
+    function generateCheckboxes() {
+      const allIngredients = new Set();
+      recipes.forEach(r => r.ingredients.forEach(i => allIngredients.add(i)));
+
+      const suggestedList = document.getElementById("suggested-list");
+      const veggieList = document.getElementById("veggie-list");
+      const avoidList = document.getElementById("avoid-list");
+
+      allIngredients.forEach(veg => {
+        const label = `<label><input type="checkbox" value="${veg}" name="available"> ${veg}</label>`;
+        const avoid = `<label><input type="checkbox" value="${veg}" name="avoid"> ${veg}</label>`;
+
+        if (staples.includes(veg)) {
+          suggestedList.insertAdjacentHTML("beforeend", label);
+        } else {
+          veggieList.insertAdjacentHTML("beforeend", label);
         }
+        avoidList.insertAdjacentHTML("beforeend", avoid);
+      });
+    }
 
-        // Suggest a meal pair
-        function suggestMeal() {
-            const selectedVeggies = Array.from(document.querySelectorAll("input[type='checkbox']:checked")).map(cb => cb.value);
+    function selectAllSuggested() {
+      document.querySelectorAll('#suggested-list input[type="checkbox"]').forEach(cb => cb.checked = true);
+    }
 
-            const filtered = recipes.filter(recipe => recipe.ingredients.every(veg => selectedVeggies.includes(veg)));
+    function suggestMeal() {
+      const selected = Array.from(document.querySelectorAll('input[name="available"]:checked')).map(cb => cb.value);
+      const avoid = Array.from(document.querySelectorAll('input[name="avoid"]:checked')).map(cb => cb.value);
 
-            const masalaCurries = filtered.filter(r => r.type === "curry" && r.tag === "masala");
-            const simpleCurries = filtered.filter(r => r.type === "curry" && r.tag === "simple");
-            const masalaSabzis = filtered.filter(r => r.type === "sabzi" && r.tag === "masala");
-            const simpleSabzis = filtered.filter(r => r.type === "sabzi" && r.tag === "simple");
+      const filtered = recipes.filter(recipe =>
+        recipe.ingredients.every(ing => selected.includes(ing)) &&
+        recipe.ingredients.every(ing => !avoid.includes(ing))
+      );
 
-            let curry, sabzi;
-            if (masalaCurries.length && simpleSabzis.length) {
-                curry = randomPick(masalaCurries);
-                sabzi = randomPick(simpleSabzis);
-            } else if (simpleCurries.length && masalaSabzis.length) {
-                curry = randomPick(simpleCurries);
-                sabzi = randomPick(masalaSabzis);
-            } else {
-                document.getElementById("result").innerHTML = "❌ No matching pair found with selected vegetables.";
-                document.getElementById("result").style.display = "block";
-                return;
-            }
+      const masalaCurries = filtered.filter(r => r.type === "curry" && r.tag === "masala");
+      const simpleCurries = filtered.filter(r => r.type === "curry" && r.tag === "simple");
+      const masalaSabzis = filtered.filter(r => r.type === "sabzi" && r.tag === "masala");
+      const simpleSabzis = filtered.filter(r => r.type === "sabzi" && r.tag === "simple");
 
-            document.getElementById("result").innerHTML = `
-                <strong>🍛 Curry:</strong> ${curry.name} (${curry.tag})<br>
-                <em>Ingredients:</em> ${curry.ingredients.join(", ")}<br><br>
-                <strong>🥗 Sabzi:</strong> ${sabzi.name} (${sabzi.tag})<br>
-                <em>Ingredients:</em> ${sabzi.ingredients.join(", ")}
-            `;
-            document.getElementById("result").style.display = "block";
-        }
+      let curry, sabzi;
+      if (masalaCurries.length && simpleSabzis.length) {
+        curry = randomPick(masalaCurries);
+        sabzi = randomPick(simpleSabzis);
+      } else if (simpleCurries.length && masalaSabzis.length) {
+        curry = randomPick(simpleCurries);
+        sabzi = randomPick(masalaSabzis);
+      } else {
+        document.getElementById("result").innerHTML = "❌ No matching pair found with selected preferences.";
+        document.getElementById("result").style.display = "block";
+        return;
+      }
 
-        // Utility: Pick random item from array
-        function randomPick(arr) {
-            return arr[Math.floor(Math.random() * arr.length)];
-        }
+      document.getElementById("result").innerHTML = `
+        <strong>🍛 Curry:</strong> ${curry.name} (${curry.tag})<br>
+        <em>Ingredients:</em> ${curry.ingredients.join(", ")}<br><br>
+        <strong>🥗 Sabzi:</strong> ${sabzi.name} (${sabzi.tag})<br>
+        <em>Ingredients:</em> ${sabzi.ingredients.join(", ")}
+      `;
+      document.getElementById("result").style.display = "block";
+    }
 
-        // Call on load
-        window.onload = generateVeggieList;
-    </script>
+    function randomPick(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    window.onload = generateCheckboxes;
+  </script>
 </body>
 </html>
