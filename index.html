@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Meal Randomiser</title>
   <style>
     body {
@@ -59,11 +59,25 @@
     button:hover {
       background: #f4511e;
     }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 10px 0;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
     .result {
       margin-top: 20px;
       background: #f1f8e9;
       padding: 15px;
       border-radius: 5px;
+    }
+    .form-section {
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 5px;
+      background: #f9f9f9;
     }
     footer {
       margin-top: 30px;
@@ -79,6 +93,26 @@
 <body>
   <header>🥘 Meal Randomiser</header>
   <div class="container">
+    <!-- Add Dish Form -->
+    <div class="form-section">
+      <h3>Add New Dish</h3>
+      <label>Dish Name:</label><br>
+      <input type="text" id="dish-name" placeholder="e.g., Paneer Butter Masala"><br>
+      
+      <label>Type:</label><br>
+      <input type="radio" name="dish-type" value="curry" checked> Curry
+      <input type="radio" name="dish-type" value="sabzi"> Sabzi<br><br>
+
+      <label>Tag:</label><br>
+      <input type="radio" name="dish-tag" value="masala" checked> Masala
+      <input type="radio" name="dish-tag" value="simple"> Simple<br><br>
+
+      <label>Ingredients (comma separated):</label><br>
+      <input type="text" id="dish-ingredients" placeholder="e.g., onion, tomato, garlic"><br>
+      <button onclick="addDish()">Save Dish</button>
+    </div>
+
+    <!-- Veggie Selectors -->
     <h3>Suggested Staples:</h3>
     <div class="checkbox-group" id="suggested-list"></div>
     <button onclick="selectAllSuggested()">Select All Suggested</button>
@@ -99,34 +133,32 @@
   </footer>
 
   <script>
-    const recipes = [
-      {
-        "name": "Dhabewali Dal",
-        "type": "curry",
-        "tag": "masala",
-        "ingredients": ["onion", "tomato", "garlic"]
-      },
-      {
-        "name": "Aloo Gobi",
-        "type": "sabzi",
-        "tag": "simple",
-        "ingredients": ["potato", "cauliflower", "onion"]
-      },
-      {
-        "name": "Baingan Bharta",
-        "type": "sabzi",
-        "tag": "masala",
-        "ingredients": ["brinjal", "onion", "tomato"]
-      },
-      {
-        "name": "Palak Paneer",
-        "type": "curry",
-        "tag": "simple",
-        "ingredients": ["spinach", "paneer", "garlic"]
-      }
-    ];
-
+    let recipes = JSON.parse(localStorage.getItem('recipes')) || [];
     const staples = ["onion", "tomato", "garlic", "potato", "ginger", "green chili"];
+
+    function saveRecipes() {
+      localStorage.setItem('recipes', JSON.stringify(recipes));
+    }
+
+    function addDish() {
+      const name = document.getElementById('dish-name').value.trim();
+      const type = document.querySelector('input[name="dish-type"]:checked').value;
+      const tag = document.querySelector('input[name="dish-tag"]:checked').value;
+      const ingredients = document.getElementById('dish-ingredients').value
+        .split(",").map(i => i.trim().toLowerCase()).filter(Boolean);
+
+      if (!name || ingredients.length === 0) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      recipes.push({ name, type, tag, ingredients });
+      saveRecipes();
+      alert(`✅ ${name} added!`);
+      document.getElementById('dish-name').value = "";
+      document.getElementById('dish-ingredients').value = "";
+      generateCheckboxes(); // refresh veggie checkboxes
+    }
 
     function generateCheckboxes() {
       const allIngredients = new Set();
@@ -135,6 +167,10 @@
       const suggestedList = document.getElementById("suggested-list");
       const veggieList = document.getElementById("veggie-list");
       const avoidList = document.getElementById("avoid-list");
+
+      suggestedList.innerHTML = "";
+      veggieList.innerHTML = "";
+      avoidList.innerHTML = "";
 
       allIngredients.forEach(veg => {
         const label = `<label><input type="checkbox" value="${veg}" name="available"> ${veg}</label>`;
